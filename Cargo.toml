@@ -1,0 +1,39 @@
+[package]
+name = "can-color-sensor"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+stm32f1xx-hal = { version = "0.9.0", features = ["rt", "stm32f103", "medium"] }
+cortex-m = "0.7.4"
+cortex-m-rt = { version = "0.7.1", features = ["device"] }
+cortex-m-rtic = "1.0.0"
+bxcan = "0.6.2"
+nb = "1.0.0"
+panic-probe = { version = "0.3.0", features = ["print-rtt"] }
+rtt-target = { version = "0.3.1", features = ["cortex-m"] }
+systick-monotonic = "1.0.0"
+apds9151 = "0.1.0"
+
+[dev.dependencies]
+panic-semihosting = { version = "0.5.2", optional = true }
+cortex-m-semihosting = "0.3.7"
+embedded-graphics = "0.7.1"
+ssd1306 = "0.7.0"
+rotary-encoder-embedded = "0.1.0"
+
+[features]
+proc-macro = []
+
+[profile.release]
+codegen-units = 1 # better optimizations
+debug = 1 # symbols are nice and they don't increase the size on Flash
+lto = true # better optimizations
+
+[profile.dev]
+codegen-units = 1 # better optimizations
+debug = 1 # symbols are nice and they don't increase the size on Flash
+lto = true # better optimizations
+#opt-level = 1

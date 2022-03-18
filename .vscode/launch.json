@@ -1,0 +1,114 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "interface": "swd",
+            "cwd": "${workspaceRoot}",
+            "executable": ".\\target\\thumbv7m-none-eabi\\debug\\examples\\send",
+            "preLaunchTask": "build-example-send",
+            "name": "Debug (OpenOCD)",
+            "device": "STM32F103C6",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f1x.cfg"
+            ],
+            "runToEntryPoint": "true",
+            "preLaunchCommands": [
+                "set print asm-demangle on",
+                "monitor arm semihosting enable",
+                "break DefaultHandler",
+                "break HardFault",
+                "break rust_begin_unwind",
+                "load"
+            ],
+            // "swoConfig": {
+            //     "enabled": true,
+            //     "cpuFrequency": 48000000,
+            //     "swoFrequency": 2000000,
+            //     "source": "probe",
+            //     "decoders": [
+            //         { "type": "console", "label": "ITM", "port": 0 }
+            //     ]
+            // },
+            "svdFile": "${workspaceRoot}\\STM32F103.svd"
+        },
+        {
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "name": "ProbeRS Debug example send",
+            "preLaunchTask": "build-example-send",
+            "cwd": "${workspaceRoot}",
+            "programBinary": ".\\target\\thumbv7m-none-eabi\\debug\\examples\\send",
+            "chip": "STM32F103C6",
+            // "connectUnderReset": true,
+            "runtimeExecutable": "probe-rs-debugger",
+            "runtimeArgs": [
+                "debug"
+            ],
+            "coreIndex": 0,
+            "flashingEnabled": true,
+            "resetAfterFlashing": true,
+            "haltAfterReset": true,
+            "consoleLogLevel": "Info", //Error, Warn, Info, Debug, Trace 
+            "rttEnabled": true,
+        },
+        {
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "name": "ProbeRS Debug can-color-send",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceRoot}",
+            "programBinary": ".\\target\\thumbv7m-none-eabi\\debug\\can-color-sensor",
+            "chip": "STM32F103VE",
+            // "connectUnderReset": true,
+            "runtimeExecutable": "probe-rs-debugger",
+            "runtimeArgs": [
+                "debug"
+            ],
+            "coreIndex": 0,
+            "flashingEnabled": true,
+            "resetAfterFlashing": true,
+            "haltAfterReset": true,
+            "consoleLogLevel": "Info", //Error, Warn, Info, Debug, Trace 
+            "rttEnabled": true,
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "interface": "swd",
+            "cwd": "${workspaceRoot}",
+            "executable": ".\\target\\thumbv7m-none-eabi\\debug\\can-color-sensor",
+            "preLaunchTask": "build",
+            "name": "Debug (OpenOCD) can-color-sensor",
+            "device": "STM32F103VE",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f1x.cfg"
+            ],
+            "runToEntryPoint": "true",
+            "preLaunchCommands": [
+                "set print asm-demangle on",
+                "monitor arm semihosting enable",
+                "break DefaultHandler",
+                "break HardFault",
+                "break rust_begin_unwind",
+                "load"
+            ],
+            // "swoConfig": {
+            //     "enabled": true,
+            //     "cpuFrequency": 48000000,
+            //     "swoFrequency": 2000000,
+            //     "source": "probe",
+            //     "decoders": [
+            //         { "type": "console", "label": "ITM", "port": 0 }
+            //     ]
+            // },
+            "svdFile": "${workspaceRoot}\\STM32F103.svd"
+        }
+    ]
+}
