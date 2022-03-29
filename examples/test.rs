@@ -10,6 +10,7 @@ use stm32f1xx_hal::{
     pac,
     prelude::*,
 };
+use shared_bus;
 use rotary_encoder_embedded::{RotaryEncoder, Direction};
 use bxcan::{self, filter::Mask32, Frame, StandardId};
 
@@ -29,29 +30,37 @@ fn main() -> ! {
     
 
     let mut gpioa = dp.GPIOA.split();
-    let mut can1 = {
-        #[cfg(not(feature = "connectivity"))]
-        let can = Can::new(dp.CAN1, dp.USB);
-        #[cfg(feature = "connectivity")]
-        let can = Can::new(dp.CAN1);
 
-        // let mut gpioa = dp.GPIOA.split();
-        let rx = gpioa.pa11.into_floating_input(&mut gpioa.crh);
-        let tx = gpioa.pa12.into_alternate_push_pull(&mut gpioa.crh);
-        can.assign_pins((tx, rx), &mut afio.mapr);
+    // let mut can1 = {
+    //     // #[cfg(not(feature = "connectivity"))]
+    //     let can = Can::new(dp.CAN1, dp.USB);
+    //     // #[cfg(feature = "connectivity")]
+    //     // let can = Can::new(dp.CAN1);
 
-        // APB1 (PCLK1): 8MHz, Bit rate: 125kBit/s, Sample Point 87.5%
-        // Value was calculated with http://www.bittiming.can-wiki.info/
-        bxcan::Can::builder(can)
-            .set_bit_timing(0x001c_0003)
-            .leave_disabled()
-    };
+    //     // let mut gpioa = dp.GPIOA.split();
+    //     let rx = gpioa.pa11.into_floating_input(&mut gpioa.crh);
+    //     let tx = gpioa.pa12.into_alternate_push_pull(&mut gpioa.crh);
+    //     can.assign_pins((tx, rx), &mut afio.mapr);
+
+    //     // APB1 (PCLK1): 8MHz, Bit rate: 125kBit/s, Sample Point 87.5%
+    //     // Value was calculated with http://www.bittiming.can-wiki.info/
+    //     bxcan::Can::builder(can)
+    //         .set_bit_timing(0x001c_0003)
+    //         .leave_disabled()
+    // };
+    let can = Can::new(dp.CAN1, dp.USB);
+    let rx = gpioa.pa11.into_floating_input(&mut gpioa.crh);
+    let tx = gpioa.pa12.into_alternate_push_pull(&mut gpioa.crh);
+    can.assign_pins((tx, rx), &mut afio.mapr);
+
+
+    
 
     // Configure filters so that can frames can be received.
-    let mut filters = can1.modify_filters();
-    filters.enable_bank(0, Mask32::accept_all());
+    // let mut filters = can1.modify_filters();
+    // filters.enable_bank(0, Mask32::accept_all());
 
-    drop(filters);
+    // drop(filters);
 
     rprintln!("CAN perif configured");
 
@@ -73,10 +82,14 @@ fn main() -> ! {
     // hprintln!("entering loop").unwrap();
 
     // Select the interface.
-    let mut can = can1;
+    // let mut can = can1;
 
     // Split the peripheral into transmitter and receiver parts.
-    block!(can.enable_non_blocking()).unwrap();
+    // block!(can.enable_non_blocking()).unwrap();
+
+    
+    let bus = shared_bus::BusManagerSimple::new(can);
+    let can_dev1 = bus.acquire_can();
 
     loop {
         // Update the encoder, which will compute its direction
@@ -90,7 +103,7 @@ fn main() -> ! {
             if index < (test.len() -1) {
                 index = index +1;
                 let frame = Frame::new_data(StandardId::new(0).unwrap(), bxcan::Data::new(test[index].as_bytes()).unwrap());
-                block!(can.transmit(&frame)).unwrap();
+                block!(can_dev1.transmit(&frame)).unwrap();
                 // if let Ok(frame) = block!(can.receive()) {
                 //     block!(can.transmit(&frame)).unwrap();
                 // }
@@ -102,7 +115,7 @@ fn main() -> ! {
             if index > 0 {
                 index = index - 1;
                 let frame = Frame::new_data(StandardId::new(0).unwrap(), bxcan::Data::new(test[index].as_bytes()).unwrap());
-                block!(can.transmit(&frame)).unwrap();
+                block!(can_dev1.transmit(&frame)).unwrap();
                 // if let Ok(frame) = block!(can.receive()) {
                 //     block!(can.transmit(&frame)).unwrap();
                 // }

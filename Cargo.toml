@@ -14,19 +14,21 @@ stm32f1xx-hal = { version = "0.9.0", features = ["rt", "stm32f103", "medium"] }
 cortex-m = "0.7.4"
 cortex-m-rt = { version = "0.7.1", features = ["device"] }
 cortex-m-rtic = "1.0.0"
-bxcan = "0.6.2"
+bxcan = { version = "0.6.2", features = ["unstable-defmt"] }
 nb = "1.0.0"
 panic-probe = { version = "0.3.0", features = ["print-rtt"] }
 rtt-target = { version = "0.3.1", features = ["cortex-m"] }
 systick-monotonic = "1.0.0"
-apds9151 = "0.1.0"
+apds9151 = "0.1.1"
+embedded-can = "0.3.0"
 
-[dev.dependencies]
-panic-semihosting = { version = "0.5.2", optional = true }
+[dev-dependencies]
+panic-semihosting = { version = "0.5.2" }
 cortex-m-semihosting = "0.3.7"
 embedded-graphics = "0.7.1"
 ssd1306 = "0.7.0"
 rotary-encoder-embedded = "0.1.0"
+shared-bus = { git = "https://github.com/codytrey/shared-bus", features = ["cortex-m"] }
 
 [features]
 proc-macro = []
